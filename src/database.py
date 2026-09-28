@@ -104,8 +104,7 @@ class RiskPrediction(Base):
     risk_score = Column(Float)          # 0-100
     risk_level = Column(String)         # Low / Medium / High / Critical
     reasons = Column(Text)              # JSON-encoded list of explanation strings
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None))
     invoice = relationship("Invoice", back_populates="risk_prediction")
 
 
@@ -117,7 +116,7 @@ class AnomalyResult(Base):
     invoice_id = Column(String, ForeignKey("invoices.invoice_id"), unique=True, nullable=False)
     anomaly_score = Column(Float)
     is_anomaly = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None))
 
     invoice = relationship("Invoice", back_populates="anomaly_result")
 

@@ -44,6 +44,7 @@ High 6 / Critical 0.
 | Duplicates | Possible double entries, labelled Exact / Strong / Weak |
 | Vendors | Spend, lateness and risk per vendor, with a drill-down |
 | Analytics | Monthly trend, spend by category, unpaid-invoice aging, key findings |
+| Fraud Lab | Hides fake invoices (6 attack types) among your real ones, runs the real detectors and shows what was caught, what slipped through and why |
 | Model Center | Real model settings and statistics, and why there is no "accuracy" |
 | Data Import | Upload CSV/Excel, see a validation report, import, score |
 | Help | Plain-language explanation of every term |
@@ -220,3 +221,33 @@ menu from a folder named `pages/`, which would duplicate the sidebar.
 ## Tech stack
 Python 3.11+ · Streamlit · Pandas · NumPy · scikit-learn · Plotly · SQLite ·
 SQLAlchemy · Joblib · pytest
+
+## Fraud Lab: testing the detector against attacks
+
+The demo data is synthetic, so there is no honest single "accuracy" number. The
+Fraud Lab replaces it with something measurable: it copies your invoices in
+memory (nothing is written to the database), hides simulated attacks among them,
+and runs the same features, anomaly model, duplicate rules and risk score the
+app always uses.
+
+| Attack | The trick |
+|---|---|
+| Sudden spike | a regular vendor bills 3-6x its normal amount |
+| Copy-paste duplicate | an old invoice re-entered under a new number, same amount, same or next day |
+| Tweaked duplicate | same invoice, amount nudged 1-5%, date moved 2-12 days |
+| Split under the limit | one large bill cut into 3 invoices just under your approval limit |
+| Creeping price | a vendor raises its price ~7% with every invoice |
+| Shell vendor | a new vendor sends round-number invoices in a quick burst |
+
+How the test is kept fair:
+* the anomaly model is the one trained on the clean data; it never sees the attacks
+* attack invoices are unpaid and not yet due, so lateness cannot get them caught; only the trick is tested
+* "caught" means at least one alarm fired (risk score at the chosen level, anomaly flag, or duplicate match);
+  you can change which alarms count
+* the same alarms are counted on your real invoices, so a detector that flags everything cannot look good
+* a set-type attack noticed only because two amounts happened to match is shown separately as "caught by chance"
+* a seed makes every run repeatable
+
+Limits: the attacks are the ones written in `src/fraud_lab.py`. Real fraud may look different, so a
+rate describes this detector against these tricks and nothing more. The misses are the point: each one
+comes with the reason it slipped through and a suggestion for the rule to build next.

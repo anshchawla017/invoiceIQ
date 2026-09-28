@@ -1,6 +1,7 @@
 """Feature engineering: relative-to-vendor features behave as designed."""
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from src.features import FEATURE_COLUMNS, build_features
@@ -32,9 +33,10 @@ def test_no_missing_values_in_model_features():
 
 def test_unpaid_invoice_uses_days_past_due():
     rows = _rows()
-    rows.loc[0, ["payment_status", "payment_delay", "payment_date"]] = ["Overdue", np.nan, np.datetime64("NaT")]
+    rows.loc[0, ["payment_status", "payment_delay", "payment_date"]] = ["Overdue", np.nan, pd.NaT]
     f = build_features(rows)
     assert f["effective_delay"].iloc[0] >= 0
+
 
 def test_input_is_not_modified():
     rows = _rows()

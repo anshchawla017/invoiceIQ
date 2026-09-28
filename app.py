@@ -18,7 +18,7 @@ from src.dashboard_data import count_invoices, load_demo_and_analyse, load_resul
 from src.database import init_db  # noqa: E402
 from src.ui import brand_block, inject_css, flash, status_pill, step_cards, welcome_hero  # noqa: E402
 from views import (analytics, anomaly_explorer, dashboard, data_import,  # noqa: E402
-                   duplicates, help_page, invoices, model_center, risk_analysis, vendors)
+                   duplicates, fraud_lab, help_page, invoices, model_center, risk_analysis, vendors)
 
 init_db()
 inject_css(st.session_state.get("iq_animate", True))
@@ -32,6 +32,7 @@ PAGES = {
     "👥  Duplicates": duplicates,
     "🏢  Vendors": vendors,
     "📈  Analytics": analytics,
+    "🧪  Fraud Lab": fraud_lab,
     "🧠  Model Center": model_center,
     "📥  Data Import": data_import,
     "❓  Help": help_page,
